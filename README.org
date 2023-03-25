@@ -1,0 +1,3 @@
+* Conan elisp
+
+The idea is to create something to use to get flags when compiling org-mode source
