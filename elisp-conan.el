@@ -1,13 +1,14 @@
-(setq required-fn (col/generic-conan-heading "[requires]"))
-(setq generator-fn (col/generic-conan-heading "[generators]"))
-(setq conan-install-cmd "conan install . --output-folder=./out --build=missing")
-
 (defun col/generic-conan-heading (heading)
   "docstring"
   (lexical-let (
                 (heading heading))
     (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))
     ))
+
+
+(setq required-fn (col/generic-conan-heading "[requires]"))
+(setq generator-fn (col/generic-conan-heading "[generators]"))
+(setq conan-install-cmd "conan install . --output-folder=./out --build=missing")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              construct               ;
@@ -52,5 +53,5 @@
   ))
 
 
-(col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("CMakeDeps") )
+(col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
 (col/conan-install "/tmp/conan")
