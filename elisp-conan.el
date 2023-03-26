@@ -9,12 +9,12 @@
 (setq required-fn (col/generic-conan-heading "[requires]"))
 (setq generator-fn (col/generic-conan-heading "[generators]"))
 (setq conan-install-cmd "conan install . --output-folder=./out --build=missing")
-
+(setq output-path "/tmp/conan-elisp")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              construct               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(funcall generator-fn '("Apa" "bepa"))
+ ;; (funcall generator-fn '("Apa" "bepa"))
 
 (defun col/construct (libs generators)
   "docstring"
@@ -26,7 +26,7 @@
     (concat require-str "\n\n" generator-str "\n")
     ))
 ;; So the idea is to provide a list of conan libraries
-(col/construct '("fmt" "sml") '("elisp-generator"))
+;; (col/construct '("fmt" "sml") '("elisp-generator"))
 
 
 
@@ -35,11 +35,12 @@
   (let (
         (buffer (get-buffer-create buffer-name))
         (content (col/construct libs gens))
+        (conan-file (f-join output-path "conanfile.txt"))
         )
     (with-current-buffer buffer
       (erase-buffer)
       (insert content)
-      (write-file "/tmp/conan/conanfile.txt")
+      (write-file conan-file)
       buffer)))
 
 
@@ -54,4 +55,28 @@
 
 
 (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
-(col/conan-install "/tmp/conan")
+(col/conan-install output-path)
+;; The idea is to use pkgconf
+
+
+
+(defun col/remove-version-from-libs (libs)
+  "Removes the version from the list "
+  (let ((transform-fn (lambda (lib) (car (s-split "/" lib 'omit-nulls) ))))
+    (mapcar transform-fn libs)
+    ))
+
+
+;; PKG_CONFIG_PATH=/tmp/conan/out pkgconf --libs --cflags fmt
+(defun col/conan-get-include (conan-libs)
+  ""
+  (let* (
+
+         (cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs --cflags " (f-join output-path "out")))
+         (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " "))
+
+        )
+    (shell-command-to-string (concat cmd lib-no-ver))))
+
+
+(col/conan-get-include '("fmt/8.1.1" "sml/1.1.4"))
