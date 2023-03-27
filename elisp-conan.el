@@ -8,61 +8,49 @@
 (setq required-fn (col/generic-conan-heading "[requires]"))
 (setq generator-fn (col/generic-conan-heading "[generators]"))
 (setq conan-install-cmd "conan install . --output-folder=./out --build=missing")
-(setq output-path "/tmp/conan-elisp")
+;;(setq output-path "/tmp/conan-elisp-")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              construct               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
- ;; (funcall generator-fn '("Apa" "bepa"))
-
 (defun col/construct (libs generators)
-  "docstring"
-  (let (
-        ( require-str (funcall required-fn libs))
-        ( generator-str (funcall generator-fn generators))
-        )
-
+  "Generate the content of a conanfile.txt (just requires and generators)"
+  (let (( require-str (funcall required-fn libs))
+        ( generator-str (funcall generator-fn generators)))
     (concat require-str "\n\n" generator-str "\n")
     ))
 ;; So the idea is to provide a list of conan libraries
 ;; (col/construct '("fmt" "sml") '("elisp-generator"))
 
 
-
-(defun col/make-buffer (buffer-name libs gens)
-  "docstring"
+(defun col/make-buffer ( libs gens)
+  "Creates a conanfile. and returns the filename"
   (let* (
-        (buffer (get-buffer-create buffer-name))
-        (content (col/construct libs gens))
-        (output-dir (make-temp-file "conan-install-" t))
-        (conan-file (f-join output-dir "conanfile.txt"))
-        )
-    (with-current-buffer buffer
-      (erase-buffer)
-      (insert content)
-      (write-file conan-file)
-      (buffer-file-name buffer))))
+         (content (col/construct libs gens))
+         (output-dir (make-temp-file "conan-install-" t))
+         (conan-file (f-join output-dir "conanfile.txt")))
+    (with-temp-file conan-file
+      (insert content))
+    conan-file
+    ))
+
+;; (col/make-buffer  '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
 
 
 
-
-
-(defun col/conan-install (dir libs generators)
-  "docstring"
-  ;TODO: default directory should be buffer-file
-  (let ((default-directory dir)
-        ;; (buffer  (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") ))
-        (buffer  (col/make-buffer "test.txt" libs generators ))
-        )
+(defun col/conan-install ( libs generators)
+  "Creates a directory structure and adds a conanfile.txt and runs the conan install."
+  (let ((conan-file  (col/make-buffer  libs  generators)))
+    (cd (f-dirname conan-file))
     (shell-command-to-string conan-install-cmd )
+    conan-file
     ))
 
 
-(col/conan-install output-path '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
+;;(col/conan-install '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
 
-(col/conan-install output-path '("asio/1.27.0" "sml/1.1.4") '("PkgConfigDeps"))
-;;(col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
-;;(col/conan-install output-path)
+;; (col/conan-install '("asio/1.27.0" "sml/1.1.4") '("PkgConfigDeps"))
+;; (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
+;; (col/conan-install output-path)
 ;; The idea is to use pkgconf
 
 
@@ -70,8 +58,6 @@
 ;;        Use the configuration
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 (defun col/remove-version-from-libs (libs)
   "Removes the version from the list "
