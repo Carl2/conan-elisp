@@ -31,16 +31,17 @@
 
 (defun col/make-buffer (buffer-name libs gens)
   "docstring"
-  (let (
+  (let* (
         (buffer (get-buffer-create buffer-name))
         (content (col/construct libs gens))
-        (conan-file (f-join output-path "conanfile.txt"))
+        (output-dir (make-temp-file "conan-install-" t))
+        (conan-file (f-join output-dir "conanfile.txt"))
         )
     (with-current-buffer buffer
       (erase-buffer)
       (insert content)
       (write-file conan-file)
-      buffer)))
+      (buffer-file-name buffer))))
 
 
 
@@ -48,16 +49,18 @@
 
 (defun col/conan-install (dir libs generators)
   "docstring"
-  (let (
-        (default-directory dir)
-        (buffer  (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") ))
+  ;TODO: default directory should be buffer-file
+  (let ((default-directory dir)
+        ;; (buffer  (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") ))
+        (buffer  (col/make-buffer "test.txt" libs generators ))
         )
     (shell-command-to-string conan-install-cmd )
-
-  ))
+    ))
 
 
 (col/conan-install output-path '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
+
+(col/conan-install output-path '("asio/1.27.0" "sml/1.1.4") '("PkgConfigDeps"))
 ;;(col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
 ;;(col/conan-install output-path)
 ;; The idea is to use pkgconf
@@ -90,6 +93,6 @@
   "Gets the include directories"
   (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --cflags " (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
-    (shell-command-to-string (concat cmd lib-no-ver))))
+    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
-;;(col/conan-get-include '("fmt/8.1.1" "sml/1.1.4"))
+;;(concat (col/conan-get-include '("fmt/8.1.1" "sml/1.1.4")) "apa")
