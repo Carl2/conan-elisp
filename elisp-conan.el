@@ -1,7 +1,6 @@
 (defun col/generic-conan-heading (heading)
   "docstring"
-  (lexical-let (
-                (heading heading))
+  (lexical-let ((heading heading))
     (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))
     ))
 
