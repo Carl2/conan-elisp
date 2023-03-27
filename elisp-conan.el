@@ -47,16 +47,27 @@
 
 
 
-(defun col/conan-install (dir)
+(defun col/conan-install (dir libs generators)
   "docstring"
-  (let ((default-directory dir))
-    (shell-command conan-install-cmd )
+  (let (
+        (default-directory dir)
+        (buffer  (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") ))
+        )
+    (shell-command-to-string conan-install-cmd )
+
   ))
 
 
-(col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
-(col/conan-install output-path)
+(col/conan-install output-path '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
+;;(col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
+;;(col/conan-install output-path)
 ;; The idea is to use pkgconf
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;        Use the configuration
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -68,15 +79,18 @@
 
 
 ;; PKG_CONFIG_PATH=/tmp/conan/out pkgconf --libs --cflags fmt
-(defun col/conan-get-include (conan-libs)
+(defun col/conan-get-compile-flags (conan-libs)
   ""
-  (let* (
+  (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs --cflags " (f-join output-path "out")))
+         (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
+    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
-         (cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs --cflags " (f-join output-path "out")))
-         (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " "))
 
-        )
+
+(defun col/conan-get-include (conan-libs)
+  "Gets the include directories"
+  (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --cflags " (f-join output-path "out")))
+         (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (shell-command-to-string (concat cmd lib-no-ver))))
 
-
-(col/conan-get-include '("fmt/8.1.1" "sml/1.1.4"))
+;;(col/conan-get-include '("fmt/8.1.1" "sml/1.1.4"))
