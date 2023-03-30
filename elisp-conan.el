@@ -29,11 +29,13 @@
 ;; todo
 
 ;;; Code:
-
-
 (provide 'conan-elisp)
 
-;;; conan-elisp.el ends here
+;; (defgroup conan-elisp
+;;   "Provides conan support for org-mode source block."
+;;   :prefix "conan-elisp-"
+;;   :group 'convenience)
+
 
 (defun col/generic-conan-heading (heading)
   "docstring"
@@ -42,7 +44,12 @@
     ))
 
 
-(setq required-fn (col/generic-conan-heading "[requires]"))
+(defcustom required-fn (col/generic-conan-heading "[requires]")
+  "Requires heading in conanfile."
+  :group 'conan-elisp
+  :type 'function)
+
+;;(setq required-fn (col/generic-conan-heading "[requires]"))
 (setq generator-fn (col/generic-conan-heading "[generators]"))
 (setq conan-install-cmd "conan install . --output-folder=./out --build=missing")
 ;;(setq output-path "/tmp/conan-elisp-")
@@ -83,7 +90,9 @@
     ))
 
 
-;;(col/conan-install '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
+
+
+;; (col/conan-install '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
 
 ;; (col/conan-install '("asio/1.27.0" "sml/1.1.4") '("PkgConfigDeps"))
 ;; (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
@@ -104,18 +113,41 @@
 
 
 ;; PKG_CONFIG_PATH=/tmp/conan/out pkgconf --libs --cflags fmt
-(defun col/conan-get-compile-flags (conan-libs)
+(defun col/conan-get-compile-flags (conan-libs output-path)
   ""
-  (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs --cflags " (f-join output-path "out")))
+  (let* (
+         (cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs --cflags " (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
-    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
+    (message "cmd %s " (concat cmd lib-no-ver))
+    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))
+    ))
 
 
 
-(defun col/conan-get-include (conan-libs)
+(defun col/conan-get-include (conan-libs output-path)
   "Gets the include directories"
   (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --cflags " (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
-;;(concat (col/conan-get-include '("fmt/8.1.1" "sml/1.1.4")) "apa")
+(concat (col/conan-get-include '("fmt/8.1.1" "sml/1.1.4")) "apa")
+
+
+(defun col/conan-elisp-install (conan-libs-list)
+  "docstring"
+  (interactive "sEnter a space sepparated list of conan packages: ")
+  (let* (
+         (current-dir default-directory)
+         (conan-libs (s-split " " conan-libs-list 'omit-nulls))
+         (temp-conan-file (col/conan-install conan-libs '("PkgConfigDeps")))
+         (compile-flags (col/conan-get-compile-flags conan-libs (f-dirname temp-conan-file)))
+         )
+    (message " conan libs %s \ntemp-conan-dir: %s flags %s" conan-libs temp-conan-file compile-flags )
+    (cd current-dir)
+
+    compile-flags
+    ))
+
+(col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13")
+;; (cd "~/git/cocode/conan-elisp")
+;;; conan-elisp.el ends here
