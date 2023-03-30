@@ -25,8 +25,9 @@
 
 
 ;;; Commentary:
-
-;; todo
+;;; This can be used in org-source to get the compile flags for source
+;;; blocks.
+;; todo alot! Buts its a start..
 
 ;;; Code:
 (provide 'conan-elisp)
@@ -92,13 +93,6 @@
 
 
 
-;; (col/conan-install '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
-
-;; (col/conan-install '("asio/1.27.0" "sml/1.1.4") '("PkgConfigDeps"))
-;; (col/make-buffer "test.txt" '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps") )
-;; (col/conan-install output-path)
-;; The idea is to use pkgconf
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;        Use the configuration
@@ -130,11 +124,17 @@
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
-(concat (col/conan-get-include '("fmt/8.1.1" "sml/1.1.4")) "apa")
+(defun col/conan-get-libs (conan-libs output-path)
+  "Gets the libraries(-l) and paths (-L) "
+  (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs " (f-join output-path "out")))
+         (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
+    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
+
+;(concat (col/conan-get-include '("fmt/8.1.1" "sml/1.1.4")) "apa")
 
 
 (defun col/conan-elisp-install (conan-libs-list)
-  "docstring"
+  "Will setup conan and install libraries, returns the compile flags (include and libs)"
   (interactive "sEnter a space sepparated list of conan packages: ")
   (let* (
          (current-dir default-directory)
@@ -148,6 +148,23 @@
     compile-flags
     ))
 
-(col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13")
-;; (cd "~/git/cocode/conan-elisp")
+
+(defun col/conan-elisp-libs (conan-libs-list)
+  "Will setup conan and install libraries, returns the compile flags (include and libs)"
+  (interactive "sEnter a space sepparated list of conan packages: ")
+  (let* (
+         (current-dir default-directory)
+         (conan-libs (s-split " " conan-libs-list 'omit-nulls))
+         (temp-conan-file (col/conan-install conan-libs '("PkgConfigDeps")))
+         (compile-flags (col/conan-get-libs conan-libs (f-dirname temp-conan-file)))
+         )
+    (message " conan libs %s \ntemp-conan-dir: %s flags %s" conan-libs temp-conan-file compile-flags )
+    (cd current-dir)
+
+    compile-flags
+    ))
+
+;; Examples
+;; (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13")
+;; (col/conan-elisp-libs "fmt/8.1.1 sml/1.1.6 zlib/1.2.13")
 ;;; conan-elisp.el ends here

@@ -1,3 +1,43 @@
 * Conan elisp
 
 The idea is to create something to use to get flags when compiling org-mode source
+
+#+begin_src example
+  #+HEADER: :includes <fmt/format.h> :libs (col/conan-elisp-libs "fmt/8.1.1")  :main no :flags (mycompileflags)
+  #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
+   int main(int argc, char *argv[])
+   {
+       fmt::print("{}","hello");
+       return 0;
+   }
+#+end_src
+
+
+
+#+HEADER: :exports none
+#+begin_src emacs-lisp :eval  no-export
+  (defun mycompileflags ()
+    "docstring"
+    (format "-std=c++20 -Wall -Wextra %s " (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6") )
+    )
+
+#+end_src
+
+#+HEADER: :includes <fmt/format.h> :libs (col/conan-elisp-libs "fmt/8.1.1")  :main no :flags (mycompileflags)
+#+HEADER: :results output raw :exports both  :noweb yes :eval no-export
+#+begin_src cpp
+   int main(int argc, char *argv[])
+   {
+       fmt::print("{}","hello");
+       return 0;
+   }
+
+#+end_src
+
+
+#+RESULTS:
+hello
+
+
+#+HEADER: :includes <>  :libs -l :main  :flags (format "%s -std=c++ -Wall -Wextra" (org-sbe "fmt_sml.org:conan_install" ))
+#+HEADER: :results output raw :exports results  :noweb yes :eval no-export
