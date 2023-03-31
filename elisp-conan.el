@@ -204,7 +204,7 @@ to retrieve the compile flags (based on argument)."
   "Install Conan packages for `libs', with `flags' specifying the options.
 - libs should be in the format \"fmt/8.1.1 zlib/1.2.13\"
 - flags could be either 'include, 'libs or 'all or 'both,
-the )
+(the last two means the samething)
 "
   (let* (
          (current-dir default-directory)
