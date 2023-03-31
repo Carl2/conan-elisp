@@ -2,42 +2,72 @@
 
 The idea is to create something to use to get flags when compiling org-mode source
 
+
+* col/conan-elisp-install
+
+Install Conan packages for `libs', with `flags' specifying the options.
+
+** Usage
+~(col/conan-elisp-install CONAN-LIBS-LIST FLAGS)~
+
+CONAN-LIBS-LIST is a string containing the names and versions of the Conan
+packages to be installed, separated by space. For example: "fmt/8.1.1 zlib/1.2.13".
+
+FLAGS is expected to be one of the symbols 'include, 'libs, 'both, or 'all.
+These options specify which Conan package information to extract:
+
+- 'include extracts the include paths for the Conan packages.
+- 'libs extracts the library paths for the Conan packages.
+- 'both extracts both the include and library paths for the Conan packages.
+- 'all is equivalent to 'both.
+
+The function first extracts the Conan package names and versions from CONAN-LIBS-LIST
+and calls the `col/conan-install` function to install the packages.
+It then extracts the include and/or library paths for the installed packages
+based on the FLAGS option, and sets the corresponding Emacs Lisp variables to
+these paths.
+
+** Example usage
+
+This installs the Conan packages for fmt and zlib with version numbers 8.1.1 and 1.2.13,
+respectively, and extracts the library paths for these packages.
+
 #+begin_src example
-  #+HEADER: :includes <fmt/format.h> :libs (col/conan-elisp-libs "fmt/8.1.1")  :main no :flags (mycompileflags)
+  #+HEADER: :includes <fmt/format.h>  :main no
+  #+HEADER: :libs (col/conan-elisp-install "fmt/8.1.1" 'libs)
+  #+HEADER: :flags (format "-std=c++20 -Wall -Wextra %s " (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6" 'include))
   #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
-   int main(int argc, char *argv[])
-   {
-       fmt::print("{}","hello");
-       return 0;
-   }
+  #+begin_src cpp
+    int main(int argc, char *argv[])
+    {
+        fmt::print("|{}|{}|","hello","conan");
+        return 0;
+    }
+
+  '#+end_src
 #+end_src
 
 
 
-#+HEADER: :exports none
-#+begin_src emacs-lisp :eval  no-export
-  (defun mycompileflags ()
-    "docstring"
-    (format "-std=c++20 -Wall -Wextra %s " (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6") )
-    )
+** Example run
 
-#+end_src
+  #+HEADER: :includes <fmt/format.h> :main no
+  #+HEADER: :libs (col/conan-elisp-install "fmt/8.1.1" 'libs)
+  #+HEADER: :flags (format "-std=c++20 -Wall -Wextra %s " (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6" 'include))
+  #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
+  #+begin_src cpp
+    int main(int argc, char *argv[])
+    {
+        fmt::print("|{}|{}|","hello","conan");
+        return 0;
+    }
 
-#+HEADER: :includes <fmt/format.h> :libs (col/conan-elisp-libs "fmt/8.1.1")  :main no :flags (mycompileflags)
-#+HEADER: :results output raw :exports both  :noweb yes :eval no-export
-#+begin_src cpp
-   int main(int argc, char *argv[])
-   {
-       fmt::print("{}","hello");
-       return 0;
-   }
+  #+end_src
 
-#+end_src
+  #+RESULTS:
+  | hello | conan |
 
+** Note
 
-#+RESULTS:
-hello
-
-
-#+HEADER: :includes <>  :libs -l :main  :flags (format "%s -std=c++ -Wall -Wextra" (org-sbe "fmt_sml.org:conan_install" ))
-#+HEADER: :results output raw :exports results  :noweb yes :eval no-export
+This function assumes that Conan is installed on the system and that the
+necessary Conan packages are available.
