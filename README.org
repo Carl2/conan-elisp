@@ -64,7 +64,6 @@ respectively, and extracts the library paths for these packages.
 
   #+end_src
 
-  #+RESULTS:
   | hello | conan |
 
 ** Note
