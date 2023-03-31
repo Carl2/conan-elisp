@@ -70,3 +70,21 @@ respectively, and extracts the library paths for these packages.
 
 This function assumes that Conan 2.0 is installed on the system and that the
 necessary Conan packages are available.
+
+** Yassnippet
+
+Since its quite demanding to create the header for the source code
+block I've created a Yassnippet to help me out.
+#+begin_example
+# -*- mode: snippet -*-
+# name: cpp src header
+# key: <cpp
+# group: col
+# --
+
+#+HEADER: :includes <$1>  :main ${2:$$(yas-choose-value '("no" "yes"))}
+#+HEADER: ${3::libs (col/conan-elisp-install "${4:fmt/9.1.0}" 'libs )}
+#+HEADER: :flags (format "%s -std=c++${5:$$(yas-choose-value '("11" "14" "17" "20"))} -Wall -Wextra" (col/conan-elisp-install "${6:fmt/9.1.0}" 'include))
+#+HEADER: :results output raw :exports results  :noweb yes :eval no-export
+
+#+end_example
