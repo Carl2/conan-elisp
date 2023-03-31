@@ -29,7 +29,7 @@ these paths.
 
 ** Example usage
 
-This installs the Conan packages for fmt and zlib with version numbers 8.1.1 and 1.2.13,
+This installs the Conan packages for fmt and sml with version numbers 8.1.1 and 1.1.6,
 respectively, and extracts the library paths for these packages.
 
 #+begin_src example
