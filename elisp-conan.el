@@ -198,11 +198,9 @@ the )
          (conan-dir (f-dirname temp-conan-file))
 
         )
-    ;;(message "opt %s libs: %s" opt  conan-libs)
     (cd current-dir)
     (funcall compile-fn conan-libs conan-dir)
-    )
-  )
+    ))
 
 ;; Examples
 ;; (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13" 'all)
