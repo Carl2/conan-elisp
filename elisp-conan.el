@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 ;;; This can be used in org-source to get the compile flags for source
-;;; blocks.
+;;; blocks. see https://github.com/Carl2/conan-elisp
 
 ;; col/conan-elisp-install
 ;;
@@ -64,16 +64,17 @@
 ;; todo alot! Buts its a start..
 
 ;;; Code:
-(provide 'conan-elisp)
 
-;; (defgroup conan-elisp
-;;   "Provides conan support for org-mode source block."
-;;   :prefix "conan-elisp-"
-;;   :group 'convenience)
 
+(defgroup conan-elisp nil
+  "Provides conan support for org-mode source block."
+  :prefix "conan-elisp-"
+  :group 'convenience)
 
 (defun col/generic-conan-heading (heading)
-  "docstring"
+  "Generates a function that takes a list of strings as input and
+returns a formatted string that includes a specified heading
+followed by the list of strings."
   (lexical-let ((heading heading))
     (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))
     ))
@@ -84,10 +85,26 @@
   :group 'conan-elisp
   :type 'function)
 
-;;(setq required-fn (col/generic-conan-heading "[requires]"))
-(setq generator-fn (col/generic-conan-heading "[generators]"))
-(setq conan-install-cmd "conan install . --output-folder=./out --build=missing")
-;;(setq output-path "/tmp/conan-elisp-")
+(defcustom generator-fn (col/generic-conan-heading "[generators]")
+  "generator tag in conanfile."
+  :group 'conan-elisp
+  :type 'function)
+
+
+(defcustom  conan-install-cmd "conan install . --output-folder=./out --build=missing"
+  "Conan install command ."
+  :group 'conan-elisp
+  :type 'string
+  )
+
+(defcustom  pkgconfig-flags-cmd "PKG_CONFIG_PATH=%s pkgconf --libs --cflags "
+  "The command to execute to get compile flags.
+the path is included with %s from the function that needs it.
+"
+  :group 'conan-elisp
+  :type 'string
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              construct               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -97,8 +114,6 @@
         ( generator-str (funcall generator-fn generators)))
     (concat require-str "\n\n" generator-str "\n")
     ))
-;; So the idea is to provide a list of conan libraries
-;; (col/construct '("fmt" "sml") '("elisp-generator"))
 
 
 (defun col/make-buffer ( libs gens)
@@ -111,9 +126,6 @@
       (insert content))
     conan-file
     ))
-
-;; (col/make-buffer  '("fmt/8.1.1" "sml/1.1.4") '("PkgConfigDeps"))
-
 
 
 (defun col/conan-install ( libs generators)
@@ -144,11 +156,11 @@
     ))
 
 
-;; PKG_CONFIG_PATH=/tmp/conan/out pkgconf --libs --cflags fmt
 (defun col/conan-get-compile-flags (conan-libs output-path)
-  ""
+  "Retuns the complete compile flags for the conan-libs , using output-path.
+Both cflags and libs are included"
   (let* (
-         (cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs --cflags " (f-join output-path "out")))
+         (cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (message "cmd %s " (concat cmd lib-no-ver))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))
@@ -157,18 +169,22 @@
 
 
 (defun col/conan-get-include (conan-libs output-path)
-  "Gets the include directories"
-  (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --cflags " (f-join output-path "out")))
+  "Gets the include directories(-I)"
+  (let* ((cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 (defun col/conan-get-libs (conan-libs output-path)
   "Gets the libraries(-l) and paths (-L) "
-  (let* ((cmd (format "PKG_CONFIG_PATH=%s pkgconf --libs " (f-join output-path "out")))
+  (let* ((cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
-;(concat (col/conan-get-include '("fmt/8.1.1" "sml/1.1.4")) "apa")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Check options and install
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun col/check-options (opts )
@@ -188,7 +204,7 @@ to retrieve the compile flags (based on argument)."
   "Install Conan packages for `libs', with `flags' specifying the options.
 - libs should be in the format \"fmt/8.1.1 zlib/1.2.13\"
 - flags could be either 'include, 'libs or 'all or 'both,
-the )
+(the last two means the samething)
 "
   (let* (
          (current-dir default-directory)
@@ -204,6 +220,7 @@ the )
     )
   )
 
+(provide 'conan-elisp)
 ;; Examples
-;; (col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13" 'all)
+;;(col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13" 'all)
 ;;; conan-elisp.el ends here
