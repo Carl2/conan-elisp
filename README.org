@@ -68,5 +68,5 @@ respectively, and extracts the library paths for these packages.
 
 ** Note
 
-This function assumes that Conan is installed on the system and that the
+This function assumes that Conan 2.0 is installed on the system and that the
 necessary Conan packages are available.
