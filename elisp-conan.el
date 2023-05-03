@@ -65,6 +65,7 @@
 
 ;;; Code:
 
+(require 'cl)
 
 (defgroup conan-elisp nil
   "Provides conan support for org-mode source block."
