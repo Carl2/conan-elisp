@@ -4,7 +4,7 @@
 ;; Maintainer: Calle
 ;; Version: 0.0.1
 ;; Package-Requires: (dependencies)
-;; Homepage: https://cocode.se
+;; Homepage: https://github.com/Carl2/melpa
 ;; Keywords: conan
 
 
