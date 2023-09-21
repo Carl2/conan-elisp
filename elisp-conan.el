@@ -33,7 +33,7 @@
 ;; Install Conan packages for `libs', with `flags' specifying the options.
 ;;
 ;; Usage:
-;; (col/conan-elisp-install CONAN-LIBS-LIST FLAGS)
+;; (col/conan-elisp-install CONAN-LIBS-LIST FLAGS &optional PRE POST)
 ;;
 ;; CONAN-LIBS-LIST is a string containing the names and versions of the Conan
 ;; packages to be installed, separated by space. For example: "fmt/8.1.1 zlib/1.2.13".
@@ -52,12 +52,24 @@
 ;; based on the FLAGS option, and sets the corresponding Emacs Lisp variables to
 ;; these paths.
 ;;
+;; PRE - These are compile flags that are added before the conan flags when compiling
+;;
+;; POST - Flags that are added to the compile flags after the conan flags.
+;;
 ;; Example usage:
-;; (col/conan-elisp-install "fmt/8.1.1 zlib/1.2.13" 'libs)
+;; (col/conan-elisp-install "fmt/8.1.1 zlib/1.2.13" 'libs "-std=c++20 -Wall -Wextra" "-O3")
 ;;
 ;; This installs the Conan packages for fmt and zlib with version numbers 8.1.1 and 1.2.13,
 ;; respectively, and extracts the library paths for these packages.
+;; It will also add the PRE-flags "-std=c++20 -Wall -Wextra" before the conan flags
 ;;
+;; this would possibly look something like:
+;; g++ -std=c++20 -Wall -Wextra -I/home/user/.conan2/p/b/fmt038de2f1e357a/p/include \
+;;    -I/home/user/.conan2/p/sml056dfa7919d57/p/include \
+;;    -L/home/user/.conan2/p/b/fmt038de2f1e357a/p/lib \
+;;    -lfmt -lm -O3 main.cpp
+;;
+;; When compiling
 ;; Note: This function assumes that Conan is installed on the system and that the
 ;; necessary Conan packages are available.
 
