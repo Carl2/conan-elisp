@@ -3,9 +3,9 @@
 ;; Author: Carl Olsen
 ;; Maintainer: Calle
 ;; Version: 0.0.1
-;; Package-Requires: (dependencies)
+;; Package-Requires: ((emacs "24.3") (s "1.7.0") (f "0.20.0"))
 ;; Homepage: https://github.com/Carl2/conan-elisp
-;; Keywords: conan
+;; Keywords: tools
 
 
 ;; This file is not part of GNU Emacs
@@ -77,7 +77,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 's)
 (require 'f)
 
@@ -93,8 +93,7 @@
 returns a formatted string that includes a specified heading
 followed by the list of strings."
   (lexical-let ((heading heading))
-    (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))
-    ))
+    (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))))
 
 
 (defcustom required-fn (col/generic-conan-heading "[requires]")
@@ -111,16 +110,14 @@ followed by the list of strings."
 (defcustom  conan-install-cmd "conan install . --output-folder=./out --build=missing"
   "Conan install command ."
   :group 'conan-elisp
-  :type 'string
-  )
+  :type 'string)
 
 (defcustom  pkgconfig-flags-cmd "PKG_CONFIG_PATH=%s pkgconf --libs --cflags "
   "The command to execute to get compile flags.
 the path is included with %s from the function that needs it.
 "
   :group 'conan-elisp
-  :type 'string
-  )
+  :type 'string)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -130,8 +127,7 @@ the path is included with %s from the function that needs it.
   "Generate the content of a conanfile.txt (just requires and generators)"
   (let (( require-str (funcall required-fn libs))
         ( generator-str (funcall generator-fn generators)))
-    (concat require-str "\n\n" generator-str "\n")
-    ))
+    (concat require-str "\n\n" generator-str "\n")))
 
 
 (defun col/make-buffer ( libs gens)
@@ -142,8 +138,7 @@ the path is included with %s from the function that needs it.
          (conan-file (f-join output-dir "conanfile.txt")))
     (with-temp-file conan-file
       (insert content))
-    conan-file
-    ))
+    conan-file))
 
 
 (defun col/conan-install ( libs generators)
@@ -155,8 +150,7 @@ the path is included with %s from the function that needs it.
     (cd (f-dirname conan-file))
     (shell-command-to-string conan-install-cmd )
     (cd current-dir)
-    conan-file
-    ))
+    conan-file))
 
 
 
@@ -213,8 +207,7 @@ to retrieve the compile flags (based on argument)."
     (include #'col/conan-get-include)
     (libs #'col/conan-get-libs )
     (both #'col/conan-get-compile-flags)
-    (all #'col/conan-get-compile-flags)
-    ))
+    (all #'col/conan-get-compile-flags)))
 
 
 
