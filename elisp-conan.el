@@ -110,6 +110,7 @@ the path is included with %s from the function that needs it.
   :type 'string
   )
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              construct               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -192,7 +193,7 @@ Both cflags and libs are included"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defun col/check-options (opts )
+(defun col/check-options (opts)
   "Takes a single argument opts which is expected to be one of the
 symbols include, libs, both, or all. and returns a function pointer
 to retrieve the compile flags (based on argument)."
@@ -205,11 +206,12 @@ to retrieve the compile flags (based on argument)."
 
 
 
-(defun col/conan-elisp-install (conan-libs-list flags)
+(defun col/conan-elisp-install (conan-libs-list flags &optional pre-flags post-flags)
   "Install Conan packages for `libs', with `flags' specifying the options.
 - libs should be in the format \"fmt/8.1.1 zlib/1.2.13\"
 - flags could be either 'include, 'libs or 'all or 'both,
 (the last two means the samething)
+- pre-flags are optional flags that will be included before the the conan compile flags
 "
   (let* (
          (current-dir default-directory)
@@ -217,13 +219,21 @@ to retrieve the compile flags (based on argument)."
          (conan-libs (s-split " " conan-libs-list 'omit-nulls))
          (temp-conan-file (col/conan-install conan-libs '("PkgConfigDeps")))
          (conan-dir (f-dirname temp-conan-file))
-
+         ;; Concatenating pre-flags, result of compile-fn, and post-flags
+         (result (concat (or (concat pre-flags " ") "")
+                         (funcall compile-fn conan-libs conan-dir)
+                         (or (concat " " post-flags) "")))
         )
     (cd current-dir)
-    (funcall compile-fn conan-libs conan-dir)
-    ))
+      result))
 
 (provide 'conan-elisp)
 ;; Examples
 ;;(col/conan-elisp-install "fmt/8.1.1 sml/1.1.6 zlib/1.2.13" 'all)
+;; With pre flags
+;;(col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
+;; With post flags
+;; (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
+;; With both pre and post flags
+;; (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
 ;;; conan-elisp.el ends here
