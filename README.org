@@ -57,9 +57,56 @@ respectively, and extracts the library paths for these packages.
 It also adds the pre-flags /"-std=c++20 -Wall -Wextra"/ which are optional.
 The same goes for post-flags.
 
+A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/
+
 #+begin_src example
   #+HEADER: :includes <fmt/format.h>  :main no
-  #+HEADER: :libs (col/conan-elisp-install "fmt/8.1.1" 'libs)
+  #+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
+  #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
+  #+begin_src cpp
+    int main(int argc, char *argv[])
+    {
+        fmt::print("|{}|{}|","hello","conan");
+        return 0;
+    }
+
+  '#+end_src
+#+end_src
+
+#+HEADER: :main no
+#+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-flto")
+#+HEADER: :results output raw :exports both  :noweb yes :eval no-export
+#+begin_src cpp
+  #define FMT_HEADER_ONLY
+  #include <fmt/format.h>
+  #include <array>
+
+  int main()
+  {
+      fmt::print("|{}|{}|\n","hello","conan");
+
+      fmt::print("|{:-<12}\n","");
+
+      std::array v= {1,2,3,255};
+      fmt::print("|{:#x}\n", fmt::join(v,"|"));
+      return 0;
+  }
+
+#+end_src
+
+#+RESULTS:
+| hello | conan |     |      |
+|-------+-------+-----+------|
+|   0x1 |   0x2 | 0x3 | 0xff |
+
+
+
+
+
+
+#+begin_src example
+  #+HEADER: :includes <fmt/format.h>  :main no
+  #+HEADER: :libs (col/conan-elisp-install "fmt/10.1.1" 'libs)
   #+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'include "-std=c++20 -Wall -Wextra")
   #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
   #+begin_src cpp
@@ -88,6 +135,9 @@ The same goes for post-flags.
     }
 
   #+end_src
+
+  #+RESULTS:
+  | hello | conan |
 
 
 
