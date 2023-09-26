@@ -77,7 +77,6 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 's)
 (require 'f)
 
@@ -142,7 +141,8 @@ the path is included with %s from the function that needs it.
 
 
 (defun conan-elisp-conan-install ( libs generators)
-  "Creates a directory structure and adds a conanfile.txt and runs the conan install."
+  "Creates a directory structure and adds a conanfile.txt
+and runs the conan install."
   (let (
         (current-dir default-directory)
         (conan-file  (conan-elisp-make-buffer libs generators)))
@@ -210,10 +210,11 @@ to retrieve the compile flags (based on argument)."
 
 (defun conan-elisp-install (conan-libs-list flags &optional pre-flags post-flags)
   "Install Conan packages for `libs', with `flags' specifying the options.
-- libs should be in the format \"fmt/8.1.1 zlib/1.2.13\"
+- libs should be in the format "fmt/8.1.1 zlib/1.2.13"
 - flags could be either 'include, 'libs or 'all or 'both,
 (the last two means the samething)
-- pre-flags are optional flags that will be included before the the conan compile flags
+- pre-flags are optional flags that will be included before the the
+  conan compile flags
 "
   (let* (
          (current-dir default-directory)
