@@ -89,9 +89,9 @@
 
 
 (defun conan-elisp-generic-conan-heading (heading)
-  "Generates a header function.
+  "Generate a header function.
 Where the input is a list of string and returns a formatted
-string that includes a specified heading followed by the list of
+string that includes a specified HEADING followed by the list of
 strings."
   (let ((heading heading))
     (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))))
@@ -115,8 +115,7 @@ strings."
 
 (defcustom  conan-elisp-pkgconfig-flags-cmd "PKG_CONFIG_PATH=%s pkgconf --libs --cflags "
   "The command to execute to get compile flags.
-the path is included with %s from the function that needs it.
-"
+the path is included with %s from the function that needs it."
   :group 'conan-elisp
   :type 'string)
 
@@ -125,14 +124,17 @@ the path is included with %s from the function that needs it.
 ;;              construct               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun conan-elisp-construct (libs generators)
-  "Generate the content of a conanfile.txt (just requires and generators)"
+  "Generate the content of a conanfile.txt (just requires and GENERATORS).
+Argument LIBS The cpp dependable libraries."
   (let (( require-str (funcall conan-elisp-required-fn libs))
         ( generator-str (funcall conan-elisp-generator-fn generators)))
     (concat require-str "\n\n" generator-str "\n")))
 
 
 (defun conan-elisp-make-buffer ( libs gens)
-  "Creates a conanfile. and returns the filename"
+  "Create a conanfile.  and return the filename.
+Argument LIBS Dependable cpp libraries.
+Argument GENS generator function."
   (let* (
          (content (conan-elisp-construct libs gens))
          (output-dir (make-temp-file "conan-install-" t))
@@ -143,8 +145,9 @@ the path is included with %s from the function that needs it.
 
 
 (defun conan-elisp-conan-install ( libs generators)
-  "Creates a directory structure and adds a conanfile.txt
-and runs the conan install."
+  "Generate conan structure and run conan install.
+Argument LIBS Depedable cpp libraries.
+Argument GENERATORS conan config generator functions."
   (let (
         (current-dir default-directory)
         (conan-file  (conan-elisp-make-buffer libs generators)))
@@ -163,13 +166,14 @@ and runs the conan install."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun conan-elisp-remove-version-from-libs (libs)
-  "Removes the version from the list "
+  "Remove the version from the list.
+Argument LIBS cpp dependable libraries."
   (let ((transform-fn (lambda (lib) (car (s-split "/" lib 'omit-nulls) ))))
     (mapcar transform-fn libs)))
 
 
 (defun conan-elisp-conan-get-compile-flags (conan-libs output-path)
-  "Retuns the complete compile flags for the conan-libs , using output-path.
+  "Retuns the complete compile flags for the CONAN-LIBS , using OUTPUT-PATH.
 Both cflags and libs are included"
   (let* (
          (cmd (format conan-elisp-pkgconfig-flags-cmd (f-join output-path "out")))
@@ -180,13 +184,17 @@ Both cflags and libs are included"
 
 
 (defun conan-elisp-conan-get-include (conan-libs output-path)
-  "Gets the include directories(-I)"
+  "Gets the include directories(-I).
+Argument CONAN-LIBS cpp libraries to be installed.
+Argument OUTPUT-PATH where to install conan files."
   (let* ((cmd (format conan-elisp-pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (conan-elisp-remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 (defun conan-elisp-conan-get-libs (conan-libs output-path)
-  "Gets the libraries(-l) and paths (-L) "
+  "Gets the libraries(-l) and paths (-L).
+Argument CONAN-LIBS conan cpp libraries.
+Argument OUTPUT-PATH where to find conan files."
   (let* ((cmd (format conan-elisp-pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (conan-elisp-remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
