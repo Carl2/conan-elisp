@@ -125,8 +125,8 @@ the path is included with %s from the function that needs it.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun conan-elisp-construct (libs generators)
   "Generate the content of a conanfile.txt (just requires and generators)"
-  (let (( require-str (funcall required-fn libs))
-        ( generator-str (funcall generator-fn generators)))
+  (let (( require-str (funcall conan-elisp-required-fn libs))
+        ( generator-str (funcall conan-elisp-generator-fn generators)))
     (concat require-str "\n\n" generator-str "\n")))
 
 
@@ -145,10 +145,9 @@ the path is included with %s from the function that needs it.
   "Creates a directory structure and adds a conanfile.txt and runs the conan install."
   (let (
         (current-dir default-directory)
-        (conan-file  (conan-elisp-make-buffer  libs  generators)))
-
+        (conan-file  (conan-elisp-make-buffer libs generators)))
     (cd (f-dirname conan-file))
-    (shell-command-to-string conan-install-cmd )
+    (shell-command-to-string conan-elisp-conan-install-cmd )
     (cd current-dir)
     conan-file))
 
@@ -171,7 +170,7 @@ the path is included with %s from the function that needs it.
   "Retuns the complete compile flags for the conan-libs , using output-path.
 Both cflags and libs are included"
   (let* (
-         (cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
+         (cmd (format conan-elisp-pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (conan-elisp-remove-version-from-libs conan-libs) " ")))
     (message "cmd %s " (concat cmd lib-no-ver))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
@@ -180,13 +179,13 @@ Both cflags and libs are included"
 
 (defun conan-elisp-conan-get-include (conan-libs output-path)
   "Gets the include directories(-I)"
-  (let* ((cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
+  (let* ((cmd (format conan-elisp-pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (conan-elisp-remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 (defun conan-elisp-conan-get-libs (conan-libs output-path)
   "Gets the libraries(-l) and paths (-L) "
-  (let* ((cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
+  (let* ((cmd (format conan-elisp-pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (conan-elisp-remove-version-from-libs conan-libs) " ")))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
