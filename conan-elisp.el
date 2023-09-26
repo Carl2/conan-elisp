@@ -76,7 +76,7 @@
 ;; todo alot! Buts its a start..
 
 ;;; Code:
-
+(require 'cl)
 (require 's)
 (require 'f)
 
