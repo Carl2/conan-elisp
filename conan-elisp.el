@@ -76,7 +76,7 @@
 ;; todo alot! Buts its a start..
 
 ;;; Code:
-(require 'cl-lib)
+(require 'cl-macs)
 (require 's)
 (require 'f)
 
