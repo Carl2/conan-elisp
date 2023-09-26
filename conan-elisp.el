@@ -76,6 +76,7 @@
 ;; todo alot! Buts its a start..
 
 ;;; Code:
+(require 'cl-lib)
 (require 's)
 (require 'f)
 
@@ -210,10 +211,15 @@ to retrieve the compile flags (based on argument)."
 
 
 (defun conan-elisp-install (conan-libs-list flags &optional pre-flags post-flags)
-  "Install Conan packages for `conan-libs-list', with `flags' specifying the options.
-- conan-libs-list should be in the format \"fmt/8.1.1 zlib/1.2.13\"
-- pre-flags could be either 'include, 'libs or 'all or 'both, (the last two means the same thing)
-- pre-flags are optional flags that will be included before the conan compile flags"
+  "Install Conan packages for `conan-libs-list', with `flags' specifying the
+options.
+- `conan-libs-list' should be in the format \"fmt/8.1.1 zlib/1.2.13\"
+- `flags' could be either ``'include``, ``'libs``, ``'all``, or ``'both``
+  (the last two mean the same thing)
+- `pre-flags' are optional flags that will be included before the conan compile
+flags.
+- `post-flags' are optional flags that will be included after the conan compile
+flags."
   (let* (
          (current-dir default-directory)
          (compile-fn (conan-elisp-check-options flags))
