@@ -210,8 +210,8 @@ to retrieve the compile flags (based on argument)."
 
 (defun conan-elisp-install (conan-libs-list flags &optional pre-flags post-flags)
   "Install Conan packages for `libs', with `flags' specifying the options.
-- libs should be in the format "fmt/8.1.1 zlib/1.2.13"
-- flags could be either 'include, 'libs or 'all or 'both,
+- libs should be in the format \"fmt/8.1.1 zlib/1.2.13\"
+- flags could be either \'include, \'libs or \'all or \'both,
 (the last two means the samething)
 - pre-flags are optional flags that will be included before the the
   conan compile flags
