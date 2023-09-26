@@ -77,7 +77,7 @@
 
 ;;; Code:
 
-(require 'cl-lib)
+(require 'cl)
 (require 's)
 (require 'f)
 
@@ -164,8 +164,7 @@ the path is included with %s from the function that needs it.
 (defun col/remove-version-from-libs (libs)
   "Removes the version from the list "
   (let ((transform-fn (lambda (lib) (car (s-split "/" lib 'omit-nulls) ))))
-    (mapcar transform-fn libs)
-    ))
+    (mapcar transform-fn libs)))
 
 
 (defun col/conan-get-compile-flags (conan-libs output-path)
@@ -175,8 +174,7 @@ Both cflags and libs are included"
          (cmd (format pkgconfig-flags-cmd (f-join output-path "out")))
          (lib-no-ver (mapconcat #'identity (col/remove-version-from-libs conan-libs) " ")))
     (message "cmd %s " (concat cmd lib-no-ver))
-    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))
-    ))
+    (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 
 
@@ -227,10 +225,9 @@ to retrieve the compile flags (based on argument)."
          ;; Concatenating pre-flags, result of compile-fn, and post-flags
          (result (concat (or (concat pre-flags " ") "")
                          (funcall compile-fn conan-libs conan-dir)
-                         (or (concat " " post-flags) "")))
-        )
+                         (or (concat " " post-flags) ""))))
     (cd current-dir)
-      result))
+    result))
 
 (provide 'conan-elisp)
 ;; Examples
