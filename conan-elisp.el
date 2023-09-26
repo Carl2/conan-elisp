@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 ;;; This can be used in org-source to get the compile flags for source
-;;; blocks. see https://github.com/Carl2/conan-elisp
+;;; blocks.  see https://github.com/Carl2/conan-elisp
 
 ;; conan-elisp-install
 ;;
@@ -36,7 +36,7 @@
 ;; (conan-elisp-install CONAN-LIBS-LIST FLAGS &optional PRE POST)
 ;;
 ;; CONAN-LIBS-LIST is a string containing the names and versions of the Conan
-;; packages to be installed, separated by space. For example: "fmt/8.1.1 zlib/1.2.13".
+;; packages to be installed, separated by space.  For example: "fmt/8.1.1 zlib/1.2.13".
 ;;
 ;; FLAGS is expected to be one of the symbols 'include, 'libs, 'both, or 'all.
 ;; These options specify which Conan package information to extract:
@@ -83,14 +83,15 @@
 
 
 (defgroup conan-elisp nil
-  "Provides conan support for org-mode source block."
+  "Provides conan support for `org-mode' source block."
   :prefix "conan-elisp-"
   :group 'convenience)
 
 (defun conan-elisp-generic-conan-heading (heading)
-  "Generates a function that takes a list of strings as input and
-returns a formatted string that includes a specified heading
-followed by the list of strings."
+  "Generates a header function.
+Where the input is a list of string and returns a formatted
+string that includes a specified heading followed by the list of
+strings."
   (lexical-let ((heading heading))
     (lambda(vals) (concat heading "\n  " (mapconcat #'identity vals "\n  ")))))
 
@@ -101,7 +102,7 @@ followed by the list of strings."
   :type 'function)
 
 (defcustom conan-elisp-generator-fn (conan-elisp-generic-conan-heading "[generators]")
-  "generator tag in conanfile."
+  "Generator tag in conanfile."
   :group 'conan-elisp
   :type 'function)
 
@@ -209,9 +210,10 @@ to retrieve the compile flags (based on argument)."
 
 
 (defun conan-elisp-install (conan-libs-list flags &optional pre-flags post-flags)
-  "Install Conan packages for \=`libs, with \=`flags specifying the options.
-- libs should be in the format \"fmt/8.1.1 zlib/1.2.13\"
-- flags could be either \='include, \='libs or \='all or \='both,
+  "Install Conan packages for \=`libs, with \=`FLAGS specifying the options.
+- libs should be in the format
+Argument CONAN-LIBS-LIST ."fmt/8.1.1 zlib/1.2.13"
+- pre-flags could be either \='include, \='libs or \='all or \='both,
 (the last two means the samething)
 - pre-flags are optional flags that will be included before the the
   conan compile flags
