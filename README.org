@@ -35,13 +35,13 @@ these paths.
 #+HEADER: :eval never-export :wrap example :exports both
 #+begin_src emacs-lisp
 ;; Examples
-(col/conan-elisp-install "fmt/10.1.1 sml/1.1.6 zlib/1.2.13" 'all)
+(conan-elisp-install "fmt/10.1.1 sml/1.1.6 zlib/1.2.13" 'all)
 ;; With pre flags
-(col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
+(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
 ;; With post flags
-(col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
+(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
 ;; With both pre and post flags
-(col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
+(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
 #+end_src
 
 Here is the output from the last line:
@@ -61,7 +61,7 @@ A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/, also
 
 #+begin_src example
 #+HEADER: :main no
-#+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-lto")
+#+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-lto")
 #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
 #+begin_src cpp
   #define FMT_HEADER_ONLY
@@ -83,7 +83,7 @@ A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/, also
 #+end_src
 
 #+HEADER: :main no
-#+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-O3")
+#+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-O3")
 #+HEADER: :results output raw :exports both  :noweb yes :eval no-export :tangle user.cpp
 #+begin_src cpp
   #define FMT_HEADER_ONLY
@@ -103,7 +103,7 @@ A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/, also
 
 #+end_src
 
-#+RESULTS:
+
 | hello | conan |     |      |
 |-------+-------+-----+------|
 |   0x1 |   0x2 | 0x3 | 0xff |
@@ -138,7 +138,6 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
   ./out
 #+end_src
 
-#+RESULTS:
 | hello | conan |     |      |
 |-------+-------+-----+------|
 |   0x1 |   0x2 | 0x3 | 0xff |
@@ -148,8 +147,8 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
 
 #+begin_src example
   #+HEADER: :includes <fmt/format.h>  :main no
-  #+HEADER: :libs (col/conan-elisp-install "fmt/10.1.1" 'libs)
-  #+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'include "-std=c++20 -Wall -Wextra")
+  #+HEADER: :libs (conan-elisp-install "fmt/10.1.1" 'libs)
+  #+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'include "-std=c++20 -Wall -Wextra")
   #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
   #+begin_src cpp
     int main(int argc, char *argv[])
@@ -166,8 +165,8 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
 ** Example run
 
   #+HEADER: :includes <fmt/format.h> :main no
-  #+HEADER: :libs (col/conan-elisp-install "fmt/10.1.1" 'libs)
-  #+HEADER: :flags (col/conan-elisp-install "fmt/10.1.1 sml/1.1.6" 'include "-std=c++20 -Wall -Wextra"))
+  #+HEADER: :libs (conan-elisp-install "fmt/10.1.1" 'libs)
+  #+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.6" 'include "-std=c++20 -Wall -Wextra"))
   #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
   #+begin_src cpp
     int main()
@@ -178,7 +177,6 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
 
   #+end_src
 
-  #+RESULTS:
   | hello | conan |
 
 
