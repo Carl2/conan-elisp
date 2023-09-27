@@ -207,9 +207,8 @@ Argument OUTPUT-PATH where to find conan files."
 
 
 (defun conan-elisp-check-options (opts)
-  "Takes a single argument opts which is expected to be one of the
-symbols include, libs, both, or all. and returns a function pointer
-to retrieve the compile flags (based on argument)."
+  "Match option flag with corresponding function.
+Argument OPTS Option include,all,libs,both."
   (cl-case opts
     (include #'conan-elisp-conan-get-include)
     (libs #'conan-elisp-conan-get-libs )
@@ -219,14 +218,13 @@ to retrieve the compile flags (based on argument)."
 
 (defun conan-elisp-install (conan-libs-list flags &optional
  pre-flags post-flags)
-  "Install Conan packages for `conan-libs-list', with `flags'
-specifying the options.
+  "Install Conan packages for `CONAN-LIBS-LIST', with `FLAGS'.
 - `conan-libs-list' should be in the format \"fmt/8.1.1 zlib/1.2.13\"
 - `flags' could be either \='include, \='libs, \='all, or \='both
   (the last two mean the same thing)
-- `pre-flags' are optional flags that will be included before the conan
+- `PRE-FLAGS' are optional flags that will be included before the conan
 compile flags.
-- `post-flags' are optional flags that will be included after the conan
+- `POST-FLAGS' are optional flags that will be included after the conan
 compile flags."
   (let* (
          (current-dir default-directory)
