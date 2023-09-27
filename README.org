@@ -9,10 +9,20 @@ It is by no means restricted to /org-mode/.
 
 see [[https://docs.conan.io/2/][conan 2]].
 
+* Install
+Make sure /Conan 2.0/ is installed (see [[https://docs.conan.io/2/][conan2]]) , and that /pkg-config/ is available on the system.
+Then install the /conan-elisp/ module.
+#+begin_src emacs-lisp
+  (use-package conan-elisp
+    :ensure t
+    )
+#+end_src
+
+That should be enough.
 
 * conan-elisp-install
 
-Install Conan packages for `libs', with `flags' specifying the options.
+
 
 ** Usage
 ~(conan-elisp-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags)~
