@@ -197,8 +197,37 @@ necessary Conan packages are available.
 
 The ~conan-elisp-install~ will generate a ~conanfile.txt~ with the
 provided content (libs) in a temporary directory/file starting with
-~conan-install-~ . It then runs /conan install/ and extracts the out
-put in a directory called ~out~ (still in the temporary directory).
+~conan-install-~ . It then runs /conan install/ and extracts the
+output in a directory called ~out~ (still in the temporary directory).
 The conan generator ~PkgConfigDeps~ is used, which will provide a
 ~pkg-config~ file. So by calling ~pkg-config~ with the ~out~ path the
 flags are retained and provided to the caller.
+
+Here is an example from the ~/tmp~ directory.
+#+begin_src example
+tmp
+├── conan-install-BADRG2
+│   ├── conanfile.txt
+│   └── out
+│       ├── conanbuildenv-release-x86_64.sh
+│       ├── conanbuild.sh
+│       ├── conanrunenv-release-x86_64.sh
+│       ├── conanrun.sh
+│       ├── deactivate_conanbuild.sh
+│       ├── deactivate_conanrun.sh
+│       ├── fmt-_fmt.pc
+│       ├── fmt.pc
+│       └── sml.pc
+#+end_src
+
+So by running:
+
+#+HEADER: :eval never-export  :results output :wrap example :exports both
+#+begin_src bash :dir "/"
+PKG_CONFIG_PATH=/tmp/conan-install-BADRG2/out pkgconf --libs --cflags fmt
+#+end_src
+
+We get the flags from the conan install.
+#+begin_example
+-I/home/user/.conan2/p/b/fmt3a721e0ef9ede/p/include -L/home/user/.conan2/p/b/fmt3a721e0ef9ede/p/lib -lfmt -lm
+#+end_example
