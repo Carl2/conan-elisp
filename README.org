@@ -1,14 +1,21 @@
 * Conan elisp
 
-The idea is to create something to use to get flags when compiling org-mode source
+The purpose of this elisp-module is to enable the use of /conan 2.0/
+libraries to retain flags for c++ in elisp. This is particularly good
+when using for example /babel/ in org-mode to make small snippets of
+c++ code that uses some external library. This can be achieved through *:flags* header
+option in org-mode source-code mode ( @see [[https://orgmode.org/manual/Working-with-Source-Code.html][org-mode, working with source code]]).
+It is by no means restricted to /org-mode/.
+
+see [[https://docs.conan.io/2/][conan 2]].
 
 
-* col/conan-elisp-install
+* conan-elisp-install
 
 Install Conan packages for `libs', with `flags' specifying the options.
 
 ** Usage
-~(col/conan-elisp-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags)~
+~(conan-elisp-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags)~
 
 CONAN-LIBS-LIST is a string containing the names and versions of the Conan
 packages to be installed, separated by space. For example: "fmt/8.1.1 zlib/1.2.13".
@@ -180,9 +187,18 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
   | hello | conan |
 
 
-
-
 ** Note
 
-This function assumes that Conan 2.0 is installed on the system and that the
+This function assumes that Conan 2.0 is installed and configured on the system and that the
 necessary Conan packages are available.
+
+
+* Inner working
+
+The ~conan-elisp-install~ will generate a ~conanfile.txt~ with the
+provided content (libs) in a temporary directory/file starting with
+~conan-install-~ . It then runs /conan install/ and extracts the out
+put in a directory called ~out~ (still in the temporary directory).
+The conan generator ~PkgConfigDeps~ is used, which will provide a
+~pkg-config~ file. So by calling ~pkg-config~ with the ~out~ path the
+flags are retained and provided to the caller.
