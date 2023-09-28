@@ -76,7 +76,6 @@
 ;; todo alot! Buts its a start..
 
 ;;; Code:
-(eval-when-compile (require 'cl))
 (require 's)
 (require 'f)
 
