@@ -25,8 +25,8 @@
 
 
 ;;; Commentary:
-;;; This can be used in org-source to get the compile flags for source
-;;; blocks.  see https://github.com/Carl2/conan-elisp
+;; This can be used in org-source to get the compile flags for source
+;; blocks.  see https://github.com/Carl2/conan-elisp
 
 ;; conan-elisp-install
 ;;
@@ -69,6 +69,15 @@
 ;;    -L/home/user/.conan2/p/b/fmt038de2f1e357a/p/lib \
 ;;    -lfmt -lm -O3 main.cpp
 ;;
+;; Examples
+;; (conan-elisp-install "fmt/10.1.1 sml/1.1.6 zlib/1.2.13" 'all)
+;; With pre flags
+;; (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
+;; With post flags
+;; (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
+;; With both pre and post flags
+;; (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
+;;
 ;; When compiling
 ;; Note: This function assumes that Conan 2.0 is installed on the system and that the
 ;; necessary Conan packages are available.
@@ -76,7 +85,7 @@
 ;; todo alot! Buts its a start..
 
 ;;; Code:
-(require 'cl-macs)
+(require 'cl-lib)
 (require 's)
 (require 'f)
 
@@ -240,12 +249,5 @@ compile flags."
     result))
 
 (provide 'conan-elisp)
-;; Examples
-;;(conan-elisp-install "fmt/10.1.1 sml/1.1.6 zlib/1.2.13" 'all)
-;; With pre flags
-;;(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
-;; With post flags
-;; (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
-;; With both pre and post flags
-;; (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
+
 ;;; conan-elisp.el ends here
