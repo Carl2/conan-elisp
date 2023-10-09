@@ -1,4 +1,4 @@
-;;; conan.el --- Generate flags for  for c++ using conan 2.0 -*- lexical-binding: t -*-
+;;; conan.el --- Generate flags for c++ using conan 2.0 -*- lexical-binding: t -*-
 
 ;; Author: Carl Olsen
 ;; Maintainer: Calle
