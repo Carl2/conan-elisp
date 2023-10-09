@@ -1,4 +1,4 @@
-* Conan elisp
+* Conan 2.0 (elisp support)
 
 The purpose of this elisp-module is to enable the use of /conan 2.0/
 libraries to retain flags for c++ in elisp. This is particularly good
@@ -13,19 +13,19 @@ see [[https://docs.conan.io/2/][conan 2]].
 Make sure /Conan 2.0/ is installed (see [[https://docs.conan.io/2/][conan2]]) , and that /pkg-config/ is available on the system.
 Then install the /conan-elisp/ module.
 #+begin_src emacs-lisp
-  (use-package conan-elisp
+  (use-package conan
     :ensure t
     )
 #+end_src
 
 That should be enough.
 
-* conan-elisp-install
+* conan-install
 
 
 
 ** Usage
-~(conan-elisp-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags)~
+~(conan-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags)~
 
 CONAN-LIBS-LIST is a string containing the names and versions of the Conan
 packages to be installed, separated by space. For example: "fmt/8.1.1 zlib/1.2.13".
@@ -39,7 +39,7 @@ These options specify which Conan package information to extract:
 - 'all is equivalent to 'both.
 
 The function first extracts the Conan package names and versions from CONAN-LIBS-LIST
-and calls the `col/conan-install` function to install the packages.
+and calls the `conan-install` function to install the packages.
 It then extracts the include and/or library paths for the installed packages
 based on the FLAGS option, and sets the corresponding Emacs Lisp variables to
 these paths.
@@ -51,19 +51,33 @@ these paths.
 
 #+HEADER: :eval never-export :wrap example :exports both
 #+begin_src emacs-lisp
-;; Examples
-(conan-elisp-install "fmt/10.1.1 sml/1.1.6 zlib/1.2.13" 'all)
-;; With pre flags
-(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
-;; With post flags
-(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
-;; With both pre and post flags
-(conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
+  ;; Examples
+  (conan-install "fmt/10.1.1 sml/1.1.6 zlib/1.2.13" 'all)
+  ;; With pre flags
+  (conan-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra")
+  ;; -std=c++20 -Wall -Wextra \
+  ;; -I/home/calle/.conan2/p/b/fmt3a721e0ef9ede/p/include \
+  ;; -I/home/calle/.conan2/p/sml056dfa7919d57/p/include \-L
+  ;; /home/calle/.conan2/p/b/fmt3a721e0ef9ede/p/lib -lfmt -lm
+  ;; With post flags
+  ;;(conan-install "fmt/10.1.1 sml/1.1.9" 'all nil "-std=c++20 -Wall -Wextra")
+  ;; -I/home/user/.conan2/p/b/fmt3a721e0ef9ede/p/include \
+  ;; -I/home/user/.conan2/p/sml056dfa7919d57/p/include \
+  ;; -L/home/user/.conan2/p/b/fmt3a721e \
+  ;; 0ef9ede/p/lib -lfmt -lm  -std=c++20 -Wall -Wextra
+  ;; With both pre and post flags
+  ;;(conan-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
 #+end_src
+
+
+
 
 Here is the output from the last line:
 #+begin_example
--std=c++20 -Wall -Wextra -I/home/user/.conan2/p/b/fmt038de2f1e357a/p/include -I/home/user/.conan2/p/sml056dfa7919d57/p/include -L/home/user/.conan2/p/b/fmt038de2f1e357a/p/lib -lfmt -lm  -o /tmp/myElf
+-std=c++20 -Wall -Wextra \
+-I/home/user/.conan2/p/b/fmt038de2f1e357a/p/include \
+-I/home/user/.conan2/p/sml056dfa7919d57/p/include \
+-L/home/user/.conan2/p/b/fmt038de2f1e357a/p/lib -lfmt -lm  -o /tmp/myElf
 #+end_example
 
 
@@ -78,7 +92,7 @@ A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/, also
 
 #+begin_src example
 #+HEADER: :main no
-#+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-lto")
+#+HEADER: :flags (conan-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-lto")
 #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
 #+begin_src cpp
   #define FMT_HEADER_ONLY
@@ -100,7 +114,7 @@ A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/, also
 #+end_src
 
 #+HEADER: :main no
-#+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-O3")
+#+HEADER: :flags (conan-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-O3")
 #+HEADER: :results output raw :exports both  :noweb yes :eval no-export :tangle user.cpp
 #+begin_src cpp
   #define FMT_HEADER_ONLY
@@ -124,6 +138,7 @@ A simple and easy to use version , using /c++20/ with fmt and /sml\/1.1.9/, also
 | hello | conan |     |      |
 |-------+-------+-----+------|
 |   0x1 |   0x2 | 0x3 | 0xff |
+
 
 
 This would be equivalent to if you create the above file and call it /main.cpp/ and run
@@ -164,8 +179,8 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
 
 #+begin_src example
   #+HEADER: :includes <fmt/format.h>  :main no
-  #+HEADER: :libs (conan-elisp-install "fmt/10.1.1" 'libs)
-  #+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.9" 'include "-std=c++20 -Wall -Wextra")
+  #+HEADER: :libs (conan-install "fmt/10.1.1" 'libs)
+  #+HEADER: :flags (conan-install "fmt/10.1.1 sml/1.1.9" 'include "-std=c++20 -Wall -Wextra")
   #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
   #+begin_src cpp
     int main(int argc, char *argv[])
@@ -182,8 +197,8 @@ This would be equivalent to if you create the above file and call it /main.cpp/ 
 ** Example run
 
   #+HEADER: :includes <fmt/format.h> :main no
-  #+HEADER: :libs (conan-elisp-install "fmt/10.1.1" 'libs)
-  #+HEADER: :flags (conan-elisp-install "fmt/10.1.1 sml/1.1.6" 'include "-std=c++20 -Wall -Wextra"))
+  #+HEADER: :libs (elisp-install "fmt/10.1.1" 'libs)
+  #+HEADER: :flags (elisp-install "fmt/10.1.1 sml/1.1.6" 'include "-std=c++20 -Wall -Wextra"))
   #+HEADER: :results output raw :exports both  :noweb yes :eval no-export
   #+begin_src cpp
     int main()
@@ -205,7 +220,7 @@ necessary Conan packages are available.
 
 * Inner working
 
-The ~conan-elisp-install~ will generate a ~conanfile.txt~ with the
+The ~conan-install~ will generate a ~conanfile.txt~ with the
 provided content (libs) in a temporary directory/file starting with
 ~conan-install-~ . It then runs /conan install/ and extracts the
 output in a directory called ~out~ (still in the temporary directory).
