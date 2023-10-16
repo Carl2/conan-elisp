@@ -182,6 +182,12 @@ Argument GENERATORS conan config generator functions."
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun conan-inspect-create-outpath (output-path)
+  "Inspect and create a outpath.
+Argument OUTPUT-PATH is the temporary conan generation path."
+  (f-join (shell-quote-argument output-path) "out"))
+
+
 (defun conan-remove-version-from-libs (libs)
   "Remove the version from the list.
 Argument LIBS cpp dependable libraries."
@@ -193,9 +199,8 @@ Argument LIBS cpp dependable libraries."
   "Retuns the complete compile flags for the CONAN-LIBS , using OUTPUT-PATH.
 Both cflags and libs are included"
   (let* (
-         (cmd (format conan-pkgconfig-flags-cmd (f-join output-path "out")))
-         (lib-no-ver (mapconcat #'identity (conan-remove-version-from-libs conan-libs) " ")))
-    (message "cmd %s " (concat cmd lib-no-ver))
+         (cmd (format conan-pkgconfig-flags-cmd (conan-inspect-create-outpath output-path)))
+         (lib-no-ver (shell-quote-argument (mapconcat #'identity (conan-remove-version-from-libs conan-libs) " "))))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 
@@ -204,16 +209,16 @@ Both cflags and libs are included"
   "Gets the include directories(-I).
 Argument CONAN-LIBS cpp libraries to be installed.
 Argument OUTPUT-PATH where to install conan files."
-  (let* ((cmd (format conan-pkgconfig-flags-cmd (f-join output-path "out")))
-         (lib-no-ver (mapconcat #'identity (conan-remove-version-from-libs conan-libs) " ")))
+  (let* ((cmd (format conan-pkgconfig-flags-cmd (conan-inspect-create-outpath output-path)))
+         (lib-no-ver (shell-quote-argument (mapconcat #'identity (conan-remove-version-from-libs conan-libs) " "))))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 (defun conan-conan-get-libs (conan-libs output-path)
   "Gets the libraries(-l) and paths (-L).
 Argument CONAN-LIBS conan cpp libraries.
 Argument OUTPUT-PATH where to find conan files."
-  (let* ((cmd (format conan-pkgconfig-flags-cmd (f-join output-path "out")))
-         (lib-no-ver (mapconcat #'identity (conan-remove-version-from-libs conan-libs) " ")))
+  (let* ((cmd (format conan-pkgconfig-flags-cmd (conan-inspect-create-outpath output-path)))
+         (lib-no-ver (shell-quote-argument (mapconcat #'identity (conan-remove-version-from-libs conan-libs) " "))))
     (s-chomp (shell-command-to-string (concat cmd lib-no-ver)))))
 
 
