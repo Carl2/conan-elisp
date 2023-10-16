@@ -12,13 +12,30 @@ see [[https://docs.conan.io/2/][conan 2]].
 * Install
 Make sure /Conan 2.0/ is installed (see [[https://docs.conan.io/2/][conan2]]) , and that /pkg-config/ is available on the system.
 Then install the /conan-elisp/ module.
+
+* Straight
+
+Using /straight/.
+
+#+begin_src emacs-lisp
+  (use-package conan
+  :straight (:host github :repo "Carl2/conan-elisp"
+         :files (:defaults "extensions/*"))
+  )
+#+end_src
+
+
+* TODO Melpa
+At this moment its not included in /Melpa/ but hopefully it will be
+shortly and in that case this should be enough.
+
 #+begin_src emacs-lisp
   (use-package conan
     :ensure t
     )
 #+end_src
 
-That should be enough.
+
 
 * conan-install
 
