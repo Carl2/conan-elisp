@@ -242,7 +242,7 @@ Argument OPTS Option include,all,libs,both."
  pre-flags post-flags)
   "Install Conan packages for `CONAN-LIBS-LIST', with `FLAGS'.
 - `conan-libs-list' should be in the format \"fmt/8.1.1 zlib/1.2.13\"
-- `flags' could be either \='include, \='libs, \='all, or \='both
+- `flags' could be either \\='include, \\='libs, \\='all, or \\='both
   (the last two mean the same thing)
 - `PRE-FLAGS' are optional flags that will be included before the conan
 compile flags.
