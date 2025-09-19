@@ -161,15 +161,22 @@ Argument GENS generator function."
     conan-file))
 
 
-(defun conan-conan-install ( libs generators)
+(defun conan-conan-install ( libs generators &optional profile)
   "Generate conan structure and run conan install.
 Argument LIBS Depedable cpp libraries.
-Argument GENERATORS conan config generator functions."
+Argument GENERATORS conan config generator functions.
+Argument PROFILE conan profile to use.
+"
   (let (
         (current-dir default-directory)
-        (conan-file  (conan-make-buffer libs generators)))
+        (conan-file  (conan-make-buffer libs generators))
+        (conan-shell-cmd
+         (if profile
+             (concat conan-conan-install-cmd " --profile=" profile)
+           conan-conan-install-cmd
+             )))
     (cd (f-dirname conan-file))
-    (shell-command-to-string conan-conan-install-cmd )
+    (shell-command-to-string conan-shell-cmd)
     (cd current-dir)
     conan-file))
 
@@ -239,7 +246,7 @@ Argument OPTS Option include,all,libs,both."
 
 
 (defun conan-install (conan-libs-list flags &optional
- pre-flags post-flags)
+ pre-flags post-flags profile)
   "Install Conan packages for `CONAN-LIBS-LIST', with `FLAGS'.
 - `conan-libs-list' should be in the format \"fmt/8.1.1 zlib/1.2.13\"
 - `flags' could be either \\='include, \\='libs, \\='all, or \\='both
@@ -247,12 +254,14 @@ Argument OPTS Option include,all,libs,both."
 - `PRE-FLAGS' are optional flags that will be included before the conan
 compile flags.
 - `POST-FLAGS' are optional flags that will be included after the conan
-compile flags."
+compile flags.
+- `PROFILE' are optional flag to provide a conan profile.
+"
   (let* (
          (current-dir default-directory)
          (compile-fn (conan-check-options flags))
          (conan-libs (s-split " " conan-libs-list 'omit-nulls))
-         (temp-conan-file (conan-conan-install conan-libs '("PkgConfigDeps")))
+         (temp-conan-file (conan-conan-install conan-libs '("PkgConfigDeps") profile))
          (conan-dir (f-dirname temp-conan-file))
          ;; Concatenating pre-flags, result of compile-fn, and post-flags
          (result (concat (or (concat pre-flags " ") "")
