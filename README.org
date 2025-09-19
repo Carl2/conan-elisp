@@ -42,7 +42,7 @@ shortly and in that case this should be enough.
 
 
 ** Usage
-~(conan-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags)~
+~(conan-install CONAN-LIBS-LIST FLAGS &optional pre-flags post-flags profile)~
 
 CONAN-LIBS-LIST is a string containing the names and versions of the Conan
 packages to be installed, separated by space. For example: "fmt/8.1.1 zlib/1.2.13".
@@ -65,6 +65,8 @@ these paths.
 
 /post-flags/ are flags which are post the conan library flags
 
+/profile/ are optional to use a specific [[https://docs.conan.io/2/reference/config_files/profiles.html][conan profile]]
+
 
 #+HEADER: :eval never-export :wrap example :exports both
 #+begin_src emacs-lisp
@@ -82,8 +84,14 @@ these paths.
   ;; -I/home/user/.conan2/p/sml056dfa7919d57/p/include \
   ;; -L/home/user/.conan2/p/b/fmt3a721e \
   ;; 0ef9ede/p/lib -lfmt -lm  -std=c++20 -Wall -Wextra
+  (conan-install "fmt/11.2.0" 'all nil nil "clang" )
+  ;;-I/home/user/.conan2/p/b/fmt53e0119a76ca4/p/include \
+  ;; -L/home/user/.conan2/p/b/fmt53e0119a76ca4/p/lib -lfmt -lm
   ;; With both pre and post flags
   (conan-install "fmt/10.1.1 sml/1.1.9" 'all "-std=c++20 -Wall -Wextra" "-o /tmp/myElf")
+  ;; With profile,
+
+
 #+end_src
 
 
